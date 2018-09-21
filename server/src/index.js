@@ -14,7 +14,7 @@ app.use(express.json());
 
 app.use('/api', routes);
 
-app.use(stateRouting);
+// app.use(stateRouting);
 
 let port = process.env.PORT || 3000;
 app.listen(port, () => {

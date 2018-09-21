@@ -1,40 +1,187 @@
-import {Router} from 'express';
-// import cs from '../chirpstore';
+import { Router } from 'express';
+import mysql from 'mysql';
+import fs from 'fs';
+
+let props;
+let pool;
+if (fs.existsSync('database-properties.json')) {
+    /* props= {
+        "host":"localhost",
+        "database":"chirpr",
+        "user":"chirprapp",
+        "password":"**********"
+        }
+*/
+    props = JSON.parse(fs.readFileSync('database-properties.json'));
+    pool = mysql.createPool(props);
+} else {
+    throw new Error(' Cannot find database properties file');
+}
 
 let router = Router();
 
-// router.get('/:id?', (req,res) => {
-//     let id = req.params.id;
-//     if(id === "nextid" ){
-//         res.json(cs.GetChirps().nextid);
-//     }else if(id){
-//         res.json(cs.GetChirp(id))
-//     }
-//     else{
-//         res.send(cs.GetChirps());
-//     }
-// });
-
-router.post('/',(req,res) => {
-    cs.CreateChirp(req.body);
-    res.json(cs.GetChirps());
-   
-
-});
-
-router.put('/:id',(req,res) => {
+router.get('/:id?', (req, res) => {
     let id = req.params.id;
-    cs.UpdateChirp(id,req.body);
-    res.sendStatus(200);
+    pool.getConnection((err, connection) => {
+        if (err) {
+            throw err
+
+        } else {
+            let hasId = ((id) ? 'WHERE ch.id = ? ' : '');
+
+            connection.query(
+                `SELECT  
+                    ch._created as time,
+                    users.name as user,
+                    ch.text as content 
+                FROM chirps ch 
+                JOIN users ON userid =users.id
+                ${hasId}`, id, (error, results, fields) => {
+                        connection.release();
+
+                        if (error) {
+                            throw (error);
+                        } else if (results.length === 0) {
+                            res.sendStatus(404);
+                            throw new Error('Invalid Chirp id ')
+                        }
+                        res.json(results);
+
+                });
+        }
+
+    });
+
 });
 
-router.delete('/:id',(req,res) => {
+router.post('/', (req, res) => {
+    let time = req.body.time.slice(0, -1);
+    let user = req.body.user;
+    let content = req.body.content;
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+
+        connection.query(
+            `INSERT INTO chirps (_created,userid,text)  
+            Values(?,?,?)`, [time, user, content], (error, results, fields) => {
+                connection.release();
+                if (error) {
+                    throw (error);
+                };
+                res.json({ time, user, content });
+            });
+
+
+
+    });
+    
+
+
+});
+
+router.put('/:id', (req, res) => {
     let id = req.params.id;
-    cs.DeleteChirp(id);
-    res.sendStatus(200);
+    let time = req.body.time.slice(0, -1);
+    let user = req.body.user;
+    let content = req.body.content;
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+
+
+        connection.query(
+            `UPDATE chirps
+            SET _created = ?,userid=?,text= ? 
+            WHERE id = ?`, [time, user, content, id], (error, results, fields) => {
+                connection.release();
+                if (error) {
+                    throw (error);
+                } else if (results.affectedRows === 0) {
+                    res.sendStatus(404);
+                    throw new Error('Invalid Chirp id ')
+                }
+                res.sendStatus(200);
+
+            });
+
+    });
 });
 
+router.delete('/:id', (req, res) => {
+    let id = req.params.id;
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
 
 
-module.exports = router;
+        connection.query(
+            `DELETE FROM chirps
+            WHERE id = ?`, id, (error, results, fields) => {
+                connection.release();
+                if (error) {
+                    throw (error);
+                } else if (results.affectedRows === 0) {
+                    res.sendStatus(404);
+                    throw new Error('Invalid Chirp id ')
+                }
+                res.sendStatus(200);
+
+            });
+
+    });
+});
+
+router.post('/:id/:userid', (req, res) => {
+    let chirpId = req.params.id;
+    let userId = req.params.userid;
+    pool.getConnection((err, connection) => {
+        if (err) throw err;
+
+        connection.query(
+            `INSERT INTO mentions (userid,chirpid)
+            Values(?,?)`, [userId,chirpId], (error, results, fields) => {
+                connection.release();
+                if (error) {
+                    res.sendStatus(404);
+                    throw (error);
+                };
+                res.json({ userId,chirpId });
+            });
+
+
+
+    });
+    
+
+
+});
+
+router.get('/user/:id', (req, res) => {
+    let id = req.params.id;
+    pool.getConnection((err, connection) => {
+        if (err) {
+            throw err
+
+        } else {
+            let hasId = ((id) ? 'WHERE ch.id = ? ' : '');
+
+            connection.query(
+                `CALL spUserMentions(?)`, id,
+                 (error, results, fields) => {
+                        connection.release();
+
+                        if (error) {
+                            throw (error);
+                        } else if (results.length === 0) {
+                            res.sendStatus(404);
+                            throw new Error('Invalid user id ')
+                        }
+                        res.json(results[0]);
+
+                });
+        }
+
+    });
+
+});
+
+export { router as default };
 
