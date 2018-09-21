@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import mysql from 'mysql';
 import fs from 'fs';
-import userRouter from './user'
 let props;
 let pool;
 if (fs.existsSync('database-properties.json')) {
