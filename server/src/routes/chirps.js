@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import mysql from 'mysql';
 import fs from 'fs';
-
+import userRouter from './user'
 let props;
 let pool;
 if (fs.existsSync('database-properties.json')) {
@@ -43,7 +43,7 @@ router.get('/:id?', (req, res) => {
                             throw (error);
                         } else if (results.length === 0) {
                             res.sendStatus(404);
-                            throw new Error('Invalid Chirp id ')
+                            throw new Error('Invalid Chirp id')
                         }
                         res.json(results);
 
@@ -97,7 +97,7 @@ router.put('/:id', (req, res) => {
                     throw (error);
                 } else if (results.affectedRows === 0) {
                     res.sendStatus(404);
-                    throw new Error('Invalid Chirp id ')
+                    throw new Error('Invalid Chirp id')
                 }
                 res.sendStatus(200);
 
@@ -120,7 +120,7 @@ router.delete('/:id', (req, res) => {
                     throw (error);
                 } else if (results.affectedRows === 0) {
                     res.sendStatus(404);
-                    throw new Error('Invalid Chirp id ')
+                    throw new Error('Invalid Chirp id')
                 }
                 res.sendStatus(200);
 
@@ -129,7 +129,7 @@ router.delete('/:id', (req, res) => {
     });
 });
 
-router.post('/:id/:userid', (req, res) => {
+router.post('/:id/user/:userid', (req, res) => {
     let chirpId = req.params.id;
     let userId = req.params.userid;
     pool.getConnection((err, connection) => {
@@ -161,18 +161,17 @@ router.get('/user/:id', (req, res) => {
             throw err
 
         } else {
-            let hasId = ((id) ? 'WHERE ch.id = ? ' : '');
+        
 
             connection.query(
                 `CALL spUserMentions(?)`, id,
                  (error, results, fields) => {
                         connection.release();
-
                         if (error) {
                             throw (error);
-                        } else if (results.length === 0) {
+                        } else if (results[0].length === 0) {
                             res.sendStatus(404);
-                            throw new Error('Invalid user id ')
+                            throw new Error('Invalid user id')
                         }
                         res.json(results[0]);
 
@@ -183,5 +182,6 @@ router.get('/user/:id', (req, res) => {
 
 });
 
-export { router as default };
+
+export { router as default, pool };
 
