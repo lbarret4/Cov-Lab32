@@ -10,11 +10,11 @@ CREATE TABLE users
 
 CREATE TABLE chirps
 (
-        id INT NOT NULL auto_increment PRIMARY KEY,
-        userid INT NOT NULL,
-            CONSTRAINT fk_userid
-                FOREIGN KEY (userid)
-                REFERENCES users(id),
+    id INT NOT NULL auto_increment PRIMARY KEY,
+    userid INT NOT NULL,
+    CONSTRAINT fk_userid
+        FOREIGN KEY (userid)
+        REFERENCES users(id),
     text TEXT NULL,
     _created DATETIME DEFAULT CURRENT_TIMESTAMP
    
@@ -30,21 +30,21 @@ CREATE TABLE mentions
         REFERENCES users(id),
     CONSTRAINT fk_mn_chirpid
         FOREIGN KEY (chirpid)
-         REFERENCES chirps(id)
+        REFERENCES chirps(id)
 );
 
 INSERT INTO users
-    (name,email,password)
-values( 'Charles', 'test@email.com', 'LdWedugh'),
-    ('Jemma', 'test1@email.com', 'easTErIO');
-    -- ( 'Kim', 'test2@email.com', 'berJoIDN'),
-    -- ('Amanda', 'test3@email.com', 'XYrItIma'),
-    -- ('Kenji', 'test4@email.com', 'iNAPAUSt'),
-    -- ('John', 'test5@email.com', 'RANAugAD'),
-    -- ('Candice', 'test6@email.com', 'ieWREBap'),
-    -- ('Robert', 'test7@email.com', 'abLeABow'),
-    -- ('Tina', 'test8@email.com', 'hiETRumV'),
-    -- ('Patricia', 'test9@email.com', 'ndBoLiaB');
+    (name)
+values( 'Charles'),
+    ('Jemma'),
+    ('Kim'),
+    ('Amanda'),
+    ('Kenji'),
+    ('John'),
+    ('Candice'),
+    ('Robert'),
+    ('Tina'),
+    ('Patricia');
 
 INSERT INTO chirps(userid, text)
 values
