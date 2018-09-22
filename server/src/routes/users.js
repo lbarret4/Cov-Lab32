@@ -3,28 +3,28 @@ import {pool} from './chirps';
 
 let router = Router();
 
-router.get('/:id?', (req, res) => {
-    let id = req.params.id;
+router.get('/:name?', (req, res) => {
+    let name = req.params.name;
     pool.getConnection((err, connection) => {
         if (err) {
             throw err
 
         } else {
-            let hasId = ((id) ? 'WHERE u.id = ? ' : '');
+            let hasName = ((name) ? 'WHERE u.name = ? ' : '');
 
             connection.query(
                 `SELECT
                     id,  
                     name as user
                 FROM users as u
-                ${hasId}`, id, (error, results, fields) => {
+                ${hasName}`, name, (error, results, fields) => {
                         connection.release();
 
                         if (error) {
                             throw (error);
                         } else if (results.length === 0) {
                             res.sendStatus(404);
-                            throw new Error('Invalid User id')
+                            throw new Error('Invalid User name')
                         }
                         res.json(results);
 
