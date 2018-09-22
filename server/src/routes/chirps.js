@@ -29,7 +29,8 @@ router.get('/:id?', (req, res) => {
             let hasId = ((id) ? 'WHERE ch.id = ? ' : '');
 
             connection.query(
-                `SELECT  
+                `SELECT 
+                    ch.id as id, 
                     ch._created as time,
                     users.name as user,
                     ch.text as content 
@@ -67,7 +68,7 @@ router.post('/', (req, res) => {
                 if (error) {
                     throw (error);
                 };
-                res.json({ time, user, content });
+                res.json({ id:results.insertId,time, user, content });
             });
 
 
