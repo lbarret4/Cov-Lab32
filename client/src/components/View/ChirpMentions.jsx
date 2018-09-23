@@ -9,27 +9,32 @@ class ChirpsMentions extends Component {
         super(props);
         this.state = {
             chirpList: [],
-            userName: "",            
+            userName: "",
             userId: "",
-          
+
 
         }
-   
+
     }
 
     async componentDidMount() {
         let id = this.props.match.params.id;
         let user = this.props.match.params.user;
         let url1 = `http://localhost:3000/api/chirps/user/${id}`;
+
+        this.setState({
+            userName: user,
+            userId: id
+
+        });
         try {
             let results = await fetch(url1);
-            results = await results.json()
-            this.setState({
-                chirpList: results,
-                userName:user,
-                userId:id
-
-            });
+            if (await results.status !== 404) {
+                results = await results.json();
+                this.setState({
+                    chirpList: results,
+                });
+            }
         } catch (error) {
             console.log(error);
         }
@@ -38,7 +43,7 @@ class ChirpsMentions extends Component {
 
 
     render() {
-     
+
 
         return (
             <Fragment>
@@ -48,7 +53,7 @@ class ChirpsMentions extends Component {
                     <div className="card-header">
                         Chirps message that mention {this.state.userName}.
                     </div>
-                   
+
                     <Chirps chirps={this.state.chirpList} />
 
                 </div>
