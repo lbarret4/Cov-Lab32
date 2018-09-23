@@ -31,6 +31,7 @@ CREATE TABLE mentions
     CONSTRAINT fk_mn_chirpid
         FOREIGN KEY (chirpid)
         REFERENCES chirps(id)
+        ON DELETE CASCADE
 );
 
 INSERT INTO users
