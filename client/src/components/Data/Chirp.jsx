@@ -56,10 +56,10 @@ class Chirp extends Component {
 
     render() {
         let chirp = this.state.chirp;
-        let path = path = `/chirps/${chirp.index}/edit`;
+        let path = `/chirps/${chirp.index}/edit`;
         return (
             <Fragment>
-                 <Header />
+                 <Header  />
                 <div className="card mt-2" style={{ maxWidth: " 90vw" }} >
 
                     <div className="card-header d-flex justify-content-between">
