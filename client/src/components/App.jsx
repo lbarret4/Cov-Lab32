@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch, Link } from 'react-router-dom';
 import { Chirp } from './Data';
-import { ChirpEdit, ChirpsFeed as Home } from './View';
+import { ChirpEdit as Edit, ChirpsFeed as Home, ChirpMentions as Mentions } from './View';
 import Header from './Header';
 
 const Navigation = () => {
@@ -12,8 +12,9 @@ const Navigation = () => {
       <div className="container">
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route exact path="/chirps/:id/edit" component={ChirpEdit} />
-          <Route path="/chirps/:id" component={Chirp} />
+          <Route exact path="/chirps/:id/edit" component={Edit} />
+          <Route exact path="/chirps/:id" component={Chirp} />
+          <Route path="/chirps/:user/:id" component={Mentions} />
 
         </Switch>
 
