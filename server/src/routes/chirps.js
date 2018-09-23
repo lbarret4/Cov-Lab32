@@ -168,12 +168,15 @@ router.get('/user/:id', (req, res) => {
                  (error, results, fields) => {
                         connection.release();
                         if (error) {
-                            throw (error);
+                            throw error;
                         } else if (results[0].length === 0) {
                             res.sendStatus(404);
-                            throw new Error('Invalid user id')
+                            console.log('Invalid user id');
                         }
-                        res.json(results[0]);
+                        else{
+                            res.json(results[0]);
+                        }
+                        
 
                 });
         }
