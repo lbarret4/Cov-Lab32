@@ -19,12 +19,12 @@ const ChirpCard = (props) => {
         );
     }
     let closeBtn = <button type="button" className="close" aria-label="Close" onClick={props.onClick}><span aria-hidden="true">&times;</span></button>;
-    let interactive = props.isFeed ? "list-group-item-action":"";
+    let interactive = props.isFeed ? "list-group-item-action text-body":"";
     
     return (
         <Fragment>
 
-            <li className={`list-group-item ${interactive}`} >
+            <li className={`list-group-item ${interactive}`}>
                 <div className="d-flex justify-content-between ">
                     <small className="text-muted " style={timeStyle}>
                         {chirp.user} on {chirp.time.toLocaleString()}
