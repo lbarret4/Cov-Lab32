@@ -12,7 +12,8 @@ class ChirpsFeed extends Component {
             chirpList: [],
             chirpUser: "1",
             chirpContent: "",
-            users: {"1":{user:"Charles"}}
+            mentionUserId: "",
+            users: { "1": { user: "Charles" } }
 
         }
         this.handlesNewChirp = this.handlesNewChirp.bind(this);
@@ -54,11 +55,12 @@ class ChirpsFeed extends Component {
     handlesPost(e) {
         e.preventDefault();
         if (this.state.chirpContent.length > 0) {
-            let url = `http://localhost:3000/api/chirps`;
+            let url1 = `http://localhost:3000/api/chirps`;
+            let url2 = `http://localhost:3000/api/chirps`;
             let chirp = {};
             chirp.time = new Date(Date.now());
             chirp.user = this.state.chirpUser;
-            chirp.content = this.state.chirpContent;
+            chirp.content = this.addMentions(this.state.chirpContent);
             let options = {
                 method: 'POST',
                 body: JSON.stringify(chirp),
@@ -66,18 +68,26 @@ class ChirpsFeed extends Component {
                     'Content-Type': 'application/json'
                 },
             };
-            (async (chirp) => {
+            (async () => {
                 try {
                     let newList = this.state.chirpList;
-                    let results = await fetch(url, options);
-                    results = await results.json();
-                    results.user = this.state.users[await results.user].user;
-                    newList.push(await results);
+                    let res1 = await fetch(url1, options);
+                    res1 = await res1.json();
+                    res1.user = this.state.users[await res1.user].user;
+                    newList.push(await res1);
                     this.setState({
                         chirpList: newList,
                         chirpContent: ""
                     });
 
+                    let newChirp = this.state.chirpList.slice(-1)[0];
+                    if (newChirp.content.includes('@')) {
+                        let newChirpId = newChirp.id;
+                        url2 = `${url2}/${newChirpId}/user/${this.state.mentionUserId}`;
+                        delete options.body;
+                        let res2 = await fetch(url2, options);
+
+                    }
                 } catch (error) {
                     console.log(error);
                 }
@@ -91,7 +101,25 @@ class ChirpsFeed extends Component {
 
     }
 
-   
+    addMentions(text) {
+        let users = this.state.users;
+        let mText = text;
+        for (let index in users) {
+            let user = users[index].user;
+            let lowUser = user.toLowerCase();
+            let lowText = text.toLowerCase();
+            if (lowText.includes(lowUser)) {
+                mText = text.replace(new RegExp(`\\b${user}`, 'gi'), `@${user}`);
+                this.setState({
+                    mentionUserId: index
+                })
+                break;
+            }
+        }
+        return mText;
+    }
+
+
     render() {
         let userId = this.state.chirpUser;
         let userName = this.state.users[userId].user;
@@ -102,7 +130,7 @@ class ChirpsFeed extends Component {
                 <div className="card mt-2" style={{ maxWidth: " 90vw" }} >
 
                     <div className="card-header">
-                       <strong> Hello {userName}!</strong> To get started, type a message and post a chirp.
+                        <strong> Hello {userName}!</strong> To get started, type a message and post a chirp.
                     </div>
                     <form>
                         <div className="input-group">
