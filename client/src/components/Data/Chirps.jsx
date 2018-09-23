@@ -11,8 +11,8 @@ const Chirps = (props) => {
         for (let index in chirps) {
             let chirp = JSON.parse(JSON.stringify(chirps[index]));
             chirp.time = new Date(chirp.time);
-            chirp.index = chirp.id;            
-            delete chirp.id; 
+            chirp.index = chirp.id;
+            delete chirp.id;
             items.push(<ChirpCard chirp={chirp} isFeed={true} key={chirp.time} />);
 
 
