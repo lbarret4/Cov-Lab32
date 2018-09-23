@@ -100,7 +100,7 @@ class ChirpsFeed extends Component {
         }
 
     }
-
+   
     addMentions(text) {
         let users = this.state.users;
         let mText = text;
@@ -126,7 +126,7 @@ class ChirpsFeed extends Component {
 
         return (
             <Fragment>
-                <Header />
+                <Header users={this.state.users} withMentions={true} />
                 <div className="card mt-2" style={{ maxWidth: " 90vw" }} >
 
                     <div className="card-header">
@@ -142,7 +142,7 @@ class ChirpsFeed extends Component {
                     </form>
 
 
-                    <Chirps chirps={this.state.chirpList} />
+                    <Chirps chirps={this.state.chirpList} onClick={this.handlesClick} />
 
                 </div>
             </Fragment>
